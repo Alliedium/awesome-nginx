@@ -10,6 +10,11 @@ docker run --name nginx-demo3 -d nginxdemos/hello
 ```
 - Show mapping between docker networks, IP addresses of the containers
   and veths
+
+Let us refer to
+https://docs.docker.com/engine/tutorials/networkingcontainers/ and
+verify
+
 Docker networks:
 ```
 ❯ docker network ls
@@ -55,6 +60,43 @@ veth3d8bdad@if25 a0aa26a1d335 nginx-demo3
 vetha2803cf@if23 2b33979ddb52 nginx-demo2
 vethffd9984@if21 c2ed21e1b401 nginx-demo1
 ```
+Why IPs start with `172.32`?
+
+Here is why:
+```
+❯ cat /etc/docker/daemon.json
+{
+  "debug" : true,
+  "default-address-pools" : [
+    {
+      "base" : "172.32.0.0/16",
+      "size" : 24
+    }
+  ]
+}
+
+```
+Refer to https://serverfault.com/questions/916941/configuring-docker-to-not-use-the-172-17-0-0-range
+
+
+
+## Access webservers running inside containers via a text based web
+browser Lynx
+
+```
+lynx http://172.32.0.3 --dump
+```
+
+## Let us see how Nginx servers are configured.
+by looking at
+
+https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
+https://github.com/nginxinc/NGINX-Demos/blob/master/nginx-hello/hello.conf
+
+let us refer to 
+
+
+http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
 ## References
 ### Docker
