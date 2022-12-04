@@ -95,7 +95,7 @@ https://github.com/nginxinc/NGINX-Demos/blob/master/nginx-hello/hello.conf
 
 let us refer to 
 
-
+https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
 http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
 ## References
