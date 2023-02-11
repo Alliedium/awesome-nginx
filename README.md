@@ -125,6 +125,35 @@ let us refer to
 https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
 http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
+## Using Nginx as a Load Balancer combined with Virtual Hosting
+
+Let us modify `/etc/hosts`:
+```
+sudo sh -c 'echo "127.0.0.1 nginx1.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx2.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx3.mkde0.intranet" >> /etc/hosts'
+```
+
+Then apply the new nginx configuration
+```
+sudo cp ./3-virtual-hosting-n-load-balancing.nginx.conf /etc/nginx/nginx.conf
+sudo nginx -s reload
+lynx http://127.0.0.1:8080 --dump
+```
+And finally let us see how Round Robing alog works:
+```
+lynx http://nginx1.mkde0.intranet:8080 --dump
+lynx http://nginx1.mkde0.intranet:8080 --dump
+lynx http://nginx1.mkde0.intranet:8080 --dump
+```
+
+The static content is available as well:
+```
+lynx http://nginx1.mkde0.intranet:8080/static-legacy --dump
+lynx http://nginx2.mkde0.intranet:8080 --dump
+```
+
+
 ## References
 ### Docker
 - https://docs.docker.com/engine/tutorials/networkingcontainers/
@@ -134,6 +163,7 @@ http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
 - http://nginx.org/en/docs/
 - http://nginx.org/en/docs/beginners_guide.html
+- https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/ 
 - https://www.baeldung.com/linux/nginx-docker-container
 - https://github.com/digitalocean/nginxconfig.io
 - https://www.digitalocean.com/community/tools/nginx
