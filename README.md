@@ -1,6 +1,33 @@
 # awesome-nginx
 
 # Getting started
+
+## Installing nginx
+### Manjaro/Arch Linux
+```
+sudo pacman -S nginx
+```
+
+## Serving static content
+
+### Single static page
+```
+sudo cp ./1-static-page.nginx.conf /etc/nginx/nginx.conf
+sudo nginx -s reload
+curl http://127.0.0.1:8080
+curl http://nginx1.mkde0.intranet:8080 --resolve nginx1.mkde0.intranet:8080:127.0.0.1
+```
+
+### Virtual hosting with static pages
+```
+sudo cp ./2-virtual-hosting-static.nginx.conf
+sudo cp /usr/share/nginx/html/index.html /usr/share/nginx/html/index2.html
+sudo sed -i "s/nginx/nginx2/g" /usr/share/nginx/html/index2.html
+curl http://127.0.0.1:8080
+curl http://nginx1.mkde0.intranet:8080 --resolve nginx1.mkde0.intranet:8080:127.0.0.1
+curl http://nginx2.mkde0.intranet:8080 --resolve nginx2.mkde0.intranet:8080:127.0.0.1
+```
+
 ## Running upstream web servers
 - Run nginx demos web servers
 ```
@@ -115,3 +142,4 @@ http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 - https://artifacthub.io/packages/helm/bitnami/nginx
 - https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
 - https://hub.docker.com/r/nginxdemos/hello/
+- https://www.youtube.com/watch?v=7VAI73roXaY
