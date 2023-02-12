@@ -108,10 +108,16 @@ Refer to https://serverfault.com/questions/916941/configuring-docker-to-not-use-
 
 
 ## Access webservers running inside containers via a text based web
-browser Lynx
+browser w3m 
+
+install w3m 
+```
+sudo pacman -S w3m
+```
+and then
 
 ```
-lynx http://172.32.0.3 --dump
+w3m http://172.32.0.3 -dump
 ```
 
 ## Let us see how Nginx servers are configured.
@@ -138,20 +144,36 @@ Then apply the new nginx configuration
 ```
 sudo cp ./3-virtual-hosting-n-load-balancing.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
-lynx http://127.0.0.1:8080 --dump
 ```
+
 And finally let us see how Round Robing alog works:
 ```
-lynx http://nginx1.mkde0.intranet:8080 --dump
-lynx http://nginx1.mkde0.intranet:8080 --dump
-lynx http://nginx1.mkde0.intranet:8080 --dump
+w3m http://127.0.0.1:8080 -dump
+w3m http://nginx1.mkde0.intranet:8080 -dump
+w3m http://nginx1.mkde0.intranet:8080 -dump
+w3m http://nginx1.mkde0.intranet:8080 -dump
 ```
 
 The static content is available as well:
 ```
-lynx http://nginx1.mkde0.intranet:8080/static-legacy --dump
-lynx http://nginx2.mkde0.intranet:8080 --dump
+w3m http://nginx1.mkde0.intranet:8080/static-legacy -dump
+w3m http://nginx2.mkde0.intranet:8080 -dump
 ```
+
+## Nginx HTTPS Virtual Hosting with SNI
+
+SNI needs to enabled which can be checked via 
+```
+nginx -V
+```
+
+Update configuration via 
+
+```
+sudo cp ./4-https-virtual-hosting-sni-no-termination.nginx.conf /etc/nginx/nginx.conf
+sudo nginx -s reload
+```
+
 
 
 ## References
@@ -164,6 +186,7 @@ lynx http://nginx2.mkde0.intranet:8080 --dump
 - http://nginx.org/en/docs/
 - http://nginx.org/en/docs/beginners_guide.html
 - https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/ 
+- https://docs.nginx.com/nginx/admin-guide/load-balancer/tcp-udp-load-balancer/
 - https://www.baeldung.com/linux/nginx-docker-container
 - https://github.com/digitalocean/nginxconfig.io
 - https://www.digitalocean.com/community/tools/nginx
