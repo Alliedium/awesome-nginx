@@ -42,6 +42,12 @@ and then
 ```
 sudo pacman -S nginx
 ```
+
+### Disclaimer
+All examples below assume the host name is "mkde0". Please make sure to
+adjust all commands for your host by replacing "mkde0" with your host
+name (use "hostname -s" to see your hostname).
+
 ### Modify `/etc/hosts`:
 ```
 sudo sh -c 'echo "127.0.0.1 nginx1.mkde0.intranet" >> /etc/hosts'
