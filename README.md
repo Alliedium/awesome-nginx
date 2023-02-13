@@ -50,15 +50,31 @@ to automatically map container names to their IPs:
 
 
 ## 1. Single static page
+
+Study NGINX config:
+```
+cat ./1-static-page.nginx.conf
+```
+And then use it to configure NGINX
 ```
 sudo cp ./1-static-page.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
-
+```
+Then make sure it works as expected
+```
 w3m http://127.0.0.1:8080 -dump
 w3m http://nginx1.mkde0.intranet:8080 -dump
 ```
 
 ## 2. Virtual hosting with static pages
+
+Study NGINX configuration:
+
+```
+cat ./2-vitual-hosting-static.nginx.conf
+```
+and then configure NGINX:
+
 ```
 sudo cp ./2-virtual-hosting-static.nginx.conf /etc/nginx/nginx.conf
 sudo cp /usr/share/nginx/html/index.html /usr/share/nginx/html/index2.html
@@ -139,7 +155,13 @@ w3m http://hello-http-1 -dump
 ```
 ### Confgure Nginx as a Load Balancer combined with Virtual Hosting
 
-Apply the new nginx configuration
+Study the new NGINX configuration:
+
+```
+cat ./3-virtual-hosting-n-load-balancing.nginx.conf
+```
+
+And then apply the new nginx configuration
 ```
 sudo cp ./3-virtual-hosting-n-load-balancing.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
@@ -192,6 +214,13 @@ w3m https://hello-https-0 -insecure -dump
 ```
 
 ### Configure NGINX for SNI
+
+Study the new config
+```
+cat ./4-virtual-hosting-sni-no-tls-termination.nginx.conf /etc/nginx/nginx.conf
+```
+
+and then apply it
 
 ```
 sudo cp ./4-virtual-hosting-sni-no-tls-termination.nginx.conf /etc/nginx/nginx.conf
