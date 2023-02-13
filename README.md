@@ -205,14 +205,21 @@ nginx -V
 ### Study how "docker-run-nginx-hello-https.sh" script works
 by looking at its source code and the correspodning Dockerfile
 
-### Run 3 https backend servers
+### Run NGINX HTTPS backend servers
+
+Build the Docker image for NGINX Hello HTTPS server first via
+```
+./nginx-in-docker/docker-build-nginx-hello-https.sh
+```
+
+and then run 3 containers
 
 ```
 ./nginx-in-docker/docker-run-nginx-hello-https.sh hello-https-0
 ./nginx-in-docker/docker-run-nginx-hello-https.sh hello-https-1
 ./nginx-in-docker/docker-run-nginx-hello-https.sh hello-https-2
 ``` 
-and make sure that their DNS names are registered in "/etc/hosts"
+Then make sure that their DNS names are registered in "/etc/hosts"
 ```
 cat /etc/hosts
 ```
