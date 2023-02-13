@@ -53,18 +53,21 @@ to automatically map container names to their IPs:
 ```
 sudo cp ./1-static-page.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
-curl http://127.0.0.1:8080
-curl http://nginx1.mkde0.intranet:8080
+
+w3m http://127.0.0.1:8080 -dump
+w3m http://nginx1.mkde0.intranet:8080 -dump
 ```
 
 ## 2. Virtual hosting with static pages
 ```
-sudo cp ./2-virtual-hosting-static.nginx.conf
+sudo cp ./2-virtual-hosting-static.nginx.conf /etc/nginx/nginx.conf
 sudo cp /usr/share/nginx/html/index.html /usr/share/nginx/html/index2.html
 sudo sed -i "s/nginx/nginx2/g" /usr/share/nginx/html/index2.html
-curl http://127.0.0.1:8080
-curl http://nginx1.mkde0.intranet:8080
-curl http://nginx2.mkde0.intranet:8080
+sudo nginx -s reload
+
+w3m http://127.0.0.1:8080 -dump
+w3m http://nginx1.mkde0.intranet:8080 -dump
+w3m http://nginx2.mkde0.intranet:8080 -dump
 ```
 
 ## 3. HTTP load balancing
@@ -90,6 +93,14 @@ scripts for running/stopping NGINX in Docker in HTTP mode
 ./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-1
 ./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-2
 ```
+and sure that Docker Hoster is registered DNS names for newly launched
+containers:
+
+```
+docker ps
+cat /etc/hosts
+```
+
 ### Show mapping between docker networks, IP addresses of the containers
   and veths
 
@@ -117,10 +128,7 @@ wget https://raw.githubusercontent.com/samos123/docker-veth/master/docker-veth.s
 Show the mapping between veths and containers
 
 ```
-❯ sudo ./docker-veth.sh
-veth3d8bdad@if25 a0aa26a1d335 nginx-demo3
-vetha2803cf@if23 2b33979ddb52 nginx-demo2
-vethffd9984@if21 c2ed21e1b401 nginx-demo1
+sudo ./docker-veth.sh
 ```
 
 ### Access webservers running inside containers via a text based web
@@ -137,9 +145,13 @@ sudo cp ./3-virtual-hosting-n-load-balancing.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
 ```
 
-And finally let us see how Round Robing alog works:
+The web page at "http://127.0.0.1:8080" is empty:
 ```
 w3m http://127.0.0.1:8080 -dump
+```
+
+while Round Robing algorithm works as expected:
+```
 w3m http://nginx1.mkde0.intranet:8080 -dump
 w3m http://nginx1.mkde0.intranet:8080 -dump
 w3m http://nginx1.mkde0.intranet:8080 -dump
@@ -151,20 +163,54 @@ w3m http://nginx1.mkde0.intranet:8080/static-legacy -dump
 w3m http://nginx2.mkde0.intranet:8080 -dump
 ```
 
-## Nginx HTTPS Virtual Hosting with SNI without TLS termination
+## 4. Nginx HTTPS Virtual Hosting with SNI without TLS termination
 
-SNI needs to enabled which can be checked via 
+### Make sure that SNI is enabled 
 ```
 nginx -V
 ```
+### Study how "docker-run-nginx-hello-https.sh" script works
+by looking at its source code and the correspodning Dockerfile
 
-Update configuration via 
+### Run 3 https backend servers
 
 ```
-sudo cp ./4-https-virtual-hosting-sni-no-tls-termination.nginx.conf /etc/nginx/nginx.conf
+./nginx-in-docker/docker-run-nginx-hello-https.sh hello-https-0
+./nginx-in-docker/docker-run-nginx-hello-https.sh hello-https-1
+./nginx-in-docker/docker-run-nginx-hello-https.sh hello-https-2
+``` 
+and make sure that their DNS names are registered in "/etc/hosts"
+```
+cat /etc/hosts
+```
+
+### See what happens if you try to access these web servers directly
+
+```
+w3m https://hello-https-0 -dump
+w3m https://hello-https-0 -insecure -dump
+```
+
+### Configure NGINX for SNI
+
+```
+sudo cp ./4-virtual-hosting-sni-no-tls-termination.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
 ```
 
+### Add 2 external FQDNs for NGINX to hosts file:
+
+```
+sudo sh -c 'echo "127.0.0.1 hello-https-0.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 hello-https-1.mkde0.intranet" >> /etc/hosts'
+```
+
+### Let us check how SNI works
+
+```
+w3m https://hello-https-0.mkde0.intranet:8443 -insecure -dump
+w3m https://hello-https-1.mkde0.intranet:8443 -insecure -dump
+```
 
 
 ## References
