@@ -259,6 +259,49 @@ w3m https://hello-https-0.mkde0.intranet:8443 -insecure -dump
 w3m https://hello-https-1.mkde0.intranet:8443 -insecure -dump
 ```
 
+## 5. Virtual Hosting with TLS termination
+
+### Run HTTP backend severs
+```
+./nginx-in-docker/docker-run-nginx-hello-http.sh "hello-http-0"
+./nginx-in-docker/docker-run-nginx-hello-http.sh "hello-http-1"
+```
+
+and make sure they are visible in "/etc/host"
+```
+cat /etc/hosts
+```
+
+### Let us generate two self-signed certificates
+```
+./nginx-in-docker/main-gen-certs.sh nginx1.mkde0.intranet
+sudo cp ./public.crt /etc/nginx/public-0.crt
+sudo cp ./private.key /etc/nginx/private-0.key
+sudo chmod a+r /etc/nginx/private-0.key
+
+./nginx-in-docker/main-gen-certs.sh nginx2.mkde0.intranet
+sudo cp ./public.crt /etc/nginx/public-1.crt
+sudo cp ./private.key /etc/nginx/private-1.key
+sudo chmod a+r /etc/nginx/private-1.key
+```
+### Study the new NGINX configuration
+```
+cat ./5-virtual-hosting--tls-termination.nginx.conf
+```
+
+### Apply the new configuration 
+```
+sudo cp ./5-virtual-hosting--tls-termination.nginx.conf /etc/nginx/
+sudo nginx -s reload
+```
+
+### Make sure reverse proxy works as expected
+
+```
+w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
+w3m https://nginx2.mkde0.intranet:8443 -dump -insecure
+```
+
 
 ## References
 ### Docker

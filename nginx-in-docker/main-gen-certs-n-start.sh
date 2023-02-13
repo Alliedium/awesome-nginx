@@ -1,11 +1,5 @@
 #!/bin/sh
 set -e
 BASEDIR=$(dirname "$0")
-$BASEDIR/00_gen-ssl-conf.sh
-$BASEDIR/0_wipe_certs.sh
-$BASEDIR/1_gen_private_key.sh
-$BASEDIR/2_gen_cert_signing_req.sh
-$BASEDIR/3_check_csr.sh
-$BASEDIR/4_gen_cert.sh
-# $BASEDIR/5_view_cert.sh
+$BASEDIR/main_gen_certs.sh $1
 nginx -g 'daemon off;'

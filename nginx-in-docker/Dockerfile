@@ -8,4 +8,4 @@ ENV COMMON_NAME localhost
 EXPOSE ${PORT} 
 COPY . /etc/nginx/
 WORKDIR /etc/nginx/
-CMD ["/bin/sh", "-c", "/etc/nginx/main-gen-certs-n-start.sh"]
+CMD ["/bin/sh", "-c", "/etc/nginx/main-gen-certs-n-start.sh $COMMON_NAME"]
