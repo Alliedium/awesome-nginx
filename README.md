@@ -1,4 +1,10 @@
 # Awesome Nexus
+## Introduction
+Please refer to 
+- https://medium.com/tech-it-out/proxy-vs-reverse-proxy-vs-load-balancer-3937915631c8
+- https://www.nginx.com/products/nginx/
+- https://levelup.gitconnected.com/multiplex-tls-traffic-with-sni-routing-ece1e4e43e56
+
 
 ## Prerequisites 
 ### Clone this repo via
@@ -187,6 +193,11 @@ w3m http://nginx2.mkde0.intranet:8080 -dump
 
 ## 4. Nginx HTTPS Virtual Hosting with SNI without TLS termination
 
+### Refer to 
+https://levelup.gitconnected.com/multiplex-tls-traffic-with-sni-routing-ece1e4e43e56
+
+to understand the network topology we are going to build
+
 ### Make sure that SNI is enabled 
 ```
 nginx -V
@@ -262,3 +273,4 @@ w3m https://hello-https-1.mkde0.intranet:8443 -insecure -dump
 - https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
 - https://hub.docker.com/r/nginxdemos/hello/
 - https://www.youtube.com/watch?v=7VAI73roXaY
+- https://levelup.gitconnected.com/multiplex-tls-traffic-with-sni-routing-ece1e4e43e56
