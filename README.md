@@ -1,41 +1,96 @@
-# awesome-nginx
+# Awesome Nexus
 
-# Getting started
+## Prerequisites 
+### Clone this repo via
+```
+git clone https://github.com/Alliedium/awesome-nginx.git
+```
 
-## Installing nginx
-### Manjaro/Arch Linux
+### Configure IP subnet for Docker containers
+Let us make it so IPs start with `172.32`?
+
+```
+❯ cat /etc/docker/daemon.json
+{
+  "debug" : true,
+  "default-address-pools" : [
+    {
+      "base" : "172.32.0.0/16",
+      "size" : 24
+    }
+  ]
+}
+```
+Refer to https://serverfault.com/questions/916941/configuring-docker-to-not-use-the-172-17-0-0-range
+### Install w3m text-based web browser
+
+install w3m 
+```
+sudo pacman -S w3m
+```
+and then
+
+### Install NGINX
+
+#### Manjaro/Arch Linux
 ```
 sudo pacman -S nginx
 ```
+### Modify `/etc/hosts`:
+```
+sudo sh -c 'echo "127.0.0.1 nginx1.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx2.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx3.mkde0.intranet" >> /etc/hosts'
+```
+### Run Docker Hoster
+to automatically map container names to their IPs:
+```
+./nginx-in-docker/docker-run-docker-hoster.sh
+```
 
-## Serving static content
 
-### Single static page
+## 1. Single static page
 ```
 sudo cp ./1-static-page.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
 curl http://127.0.0.1:8080
-curl http://nginx1.mkde0.intranet:8080 --resolve nginx1.mkde0.intranet:8080:127.0.0.1
+curl http://nginx1.mkde0.intranet:8080
 ```
 
-### Virtual hosting with static pages
+## 2. Virtual hosting with static pages
 ```
 sudo cp ./2-virtual-hosting-static.nginx.conf
 sudo cp /usr/share/nginx/html/index.html /usr/share/nginx/html/index2.html
 sudo sed -i "s/nginx/nginx2/g" /usr/share/nginx/html/index2.html
 curl http://127.0.0.1:8080
-curl http://nginx1.mkde0.intranet:8080 --resolve nginx1.mkde0.intranet:8080:127.0.0.1
-curl http://nginx2.mkde0.intranet:8080 --resolve nginx2.mkde0.intranet:8080:127.0.0.1
+curl http://nginx1.mkde0.intranet:8080
+curl http://nginx2.mkde0.intranet:8080
 ```
 
-## Running upstream web servers
-- Run nginx demos web servers
+## 3. HTTP load balancing
+### Let us see how Nginx servers are configured.
+Let us have a look at NGINX-Demos/nginx-hello docker image and study how
+it configures NGINX by looking at
+
+https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
+https://github.com/nginxinc/NGINX-Demos/blob/master/nginx-hello/hello.conf
+
+Also let us refer to 
+
+https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
+http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
+
+### Study helper scripts for running NGINX in Docker 
+All the scripts are in `./nginx-in-docker` folder, pay attention to 
+scripts for running/stopping NGINX in Docker in HTTP mode 
+
+### Run nginx demos web servers
 ```
-docker run --name nginx-demo1 -d nginxdemos/hello
-docker run --name nginx-demo2 -d nginxdemos/hello
-docker run --name nginx-demo3 -d nginxdemos/hello
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-0
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-1
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-2
 ```
-- Show mapping between docker networks, IP addresses of the containers
+### Show mapping between docker networks, IP addresses of the containers
   and veths
 
 Let us refer to
@@ -44,35 +99,15 @@ verify
 
 Docker networks:
 ```
-❯ docker network ls
-NETWORK ID     NAME      DRIVER    SCOPE
-29022f4329f5   bridge    bridge    local
-ae410447d1ce   host      host      local
-66bf26e5b59f   none      null      local
+docker network ls
 ```
 Linux bridges and links:
 ```
-❯ ip link
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-    link/ether 22:05:2c:25:96:e4 brd ff:ff:ff:ff:ff:ff
-    altname enp0s18
-8: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
-    link/ether 02:42:f7:58:80:58 brd ff:ff:ff:ff:ff:ff
-22: vethffd9984@if21: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP mode DEFAULT group default 
-    link/ether e6:5c:4a:3f:51:99 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-24: vetha2803cf@if23: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP mode DEFAULT group default 
-    link/ether 56:8a:d2:4e:0c:76 brd ff:ff:ff:ff:ff:ff link-netnsid 1
-26: veth3d8bdad@if25: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master docker0 state UP mode DEFAULT group default 
-    link/ether ca:de:b8:c0:90:71 brd ff:ff:ff:ff:ff:ff link-netnsid 2
+ip link
 ```
 Mapping between containers, IP addresses and bridges
 ```
-❯ docker inspect -f '{{.Name}} - {{.NetworkSettings.IPAddress }} - {{.NetworkSettings.Networks}}' $(docker ps -aq)
-/nginx-demo3 - 172.32.0.4 - map[bridge:0xc00014a600]
-/nginx-demo2 - 172.32.0.3 - map[bridge:0xc0002f8000]
-/nginx-demo1 - 172.32.0.2 - map[bridge:0xc00014acc0]
+docker inspect -f '{{.Name}} - {{.NetworkSettings.IPAddress }} - {{.NetworkSettings.Networks}}' $(docker ps -aq)
 ```
 
 Download the script for mapping between veths and containers
@@ -87,60 +122,16 @@ veth3d8bdad@if25 a0aa26a1d335 nginx-demo3
 vetha2803cf@if23 2b33979ddb52 nginx-demo2
 vethffd9984@if21 c2ed21e1b401 nginx-demo1
 ```
-Why IPs start with `172.32`?
 
-Here is why:
-```
-❯ cat /etc/docker/daemon.json
-{
-  "debug" : true,
-  "default-address-pools" : [
-    {
-      "base" : "172.32.0.0/16",
-      "size" : 24
-    }
-  ]
-}
+### Access webservers running inside containers via a text based web
 
 ```
-Refer to https://serverfault.com/questions/916941/configuring-docker-to-not-use-the-172-17-0-0-range
-
-
-
-## Access webservers running inside containers via a text based web
-browser w3m 
-
-install w3m 
+w3m http://hello-http-0 -dump
+w3m http://hello-http-1 -dump
 ```
-sudo pacman -S w3m
-```
-and then
+### Confgure Nginx as a Load Balancer combined with Virtual Hosting
 
-```
-w3m http://172.32.0.3 -dump
-```
-
-## Let us see how Nginx servers are configured.
-by looking at
-
-https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
-https://github.com/nginxinc/NGINX-Demos/blob/master/nginx-hello/hello.conf
-
-let us refer to 
-
-https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
-http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
-
-## Using Nginx as a Load Balancer combined with Virtual Hosting
-
-Let us modify `/etc/hosts`:
-```
-sudo sh -c 'echo "127.0.0.1 nginx1.mkde0.intranet" >> /etc/hosts'
-sudo sh -c 'echo "127.0.0.1 nginx2.mkde0.intranet" >> /etc/hosts'
-sudo sh -c 'echo "127.0.0.1 nginx3.mkde0.intranet" >> /etc/hosts'
-```
-
-Then apply the new nginx configuration
+Apply the new nginx configuration
 ```
 sudo cp ./3-virtual-hosting-n-load-balancing.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
@@ -160,7 +151,7 @@ w3m http://nginx1.mkde0.intranet:8080/static-legacy -dump
 w3m http://nginx2.mkde0.intranet:8080 -dump
 ```
 
-## Nginx HTTPS Virtual Hosting with SNI
+## Nginx HTTPS Virtual Hosting with SNI without TLS termination
 
 SNI needs to enabled which can be checked via 
 ```
@@ -170,7 +161,7 @@ nginx -V
 Update configuration via 
 
 ```
-sudo cp ./4-https-virtual-hosting-sni-no-termination.nginx.conf /etc/nginx/nginx.conf
+sudo cp ./4-https-virtual-hosting-sni-no-tls-termination.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
 ```
 
