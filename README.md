@@ -184,7 +184,7 @@ The web page at "http://127.0.0.1:8080" is empty:
 w3m http://127.0.0.1:8080 -dump
 ```
 
-while Round Robing algorithm works as expected:
+while Round Robin algorithm works as expected:
 ```
 w3m http://nginx1.mkde0.intranet:8080 -dump
 w3m http://nginx1.mkde0.intranet:8080 -dump
@@ -241,7 +241,7 @@ w3m https://hello-https-0 -insecure -dump
 
 Study the new config
 ```
-cat ./4-virtual-hosting-sni-no-tls-termination.nginx.conf /etc/nginx/nginx.conf
+cat ./4-virtual-hosting-sni-no-tls-termination.nginx.conf
 ```
 
 and then apply it
