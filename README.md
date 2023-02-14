@@ -45,6 +45,7 @@ and then
 #### Manjaro/Arch Linux
 ```
 sudo pacman -S nginx
+sudo systemctl enable nginx --now
 ```
 
 ### Disclaimer
