@@ -34,7 +34,7 @@ Let us make it so IPs start with `172.32`?
 Refer to https://serverfault.com/questions/916941/configuring-docker-to-not-use-the-172-17-0-0-range
 ### Install w3m text-based web browser
 
-install w3m 
+install w3m (see https://github.com/tats/w3m):
 ```
 sudo pacman -S w3m
 ```
