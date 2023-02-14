@@ -118,8 +118,7 @@ https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
 http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
 ### Study helper scripts for running NGINX in Docker 
-All the scripts are in `./nginx-in-docker` folder, pay attention to 
-scripts for running/stopping NGINX in Docker in HTTP mode. Here is what
+All the scripts are in `./nginx-in-docker` folder. Here is what
 each of the script does:
 
 - `docker-run-nginx-hello-http.sh "hello-http-0"` launches HTTP
