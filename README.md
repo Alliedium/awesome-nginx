@@ -9,8 +9,12 @@ Please refer to
 ## Prerequisites 
 ### Clone this repo via
 ```
-git clone https://github.com/Alliedium/awesome-nginx.git
+git clone https://github.com/Alliedium/awesome-nginx.git ~/awesome-nginx
+cd ~/awesome-nginx
 ```
+
+In all the examples below assume that current folder is
+"~/awesome-nginx".
 
 ### Configure IP subnet for Docker containers
 Let us make it so IPs start with `172.32`?
@@ -70,7 +74,9 @@ cat ./1-static-page.nginx.conf
 And then use it to configure NGINX
 ```
 sudo cp ./1-static-page.nginx.conf /etc/nginx/nginx.conf
-sudo nginx -s reload
+sudo nginx -s reload 
+#    this is the same as 
+# sudo systemctl reload nginx
 ```
 Then make sure it works as expected
 ```
@@ -113,7 +119,27 @@ http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
 ### Study helper scripts for running NGINX in Docker 
 All the scripts are in `./nginx-in-docker` folder, pay attention to 
-scripts for running/stopping NGINX in Docker in HTTP mode 
+scripts for running/stopping NGINX in Docker in HTTP mode. Here is what
+each of the script does:
+
+- `docker-run-nginx-hello-http.sh "hello-http-0"` launches HTTP
+  sever with DNS name "hello-http-0" in Docker container named
+  "hello-http-0" on port 80
+
+- `docker-run-nginx-hello-https.sh "hello-https-0"` launches HTTPS 
+  sever with DNS name "hello-https-0" and self-signed certificate issued
+  for "hello-https-0.mkde0.intranet" in Docker container named
+  "hello-https-0" on port 443
+
+- `docker-run-docker-hoster.sh` runs "Docker hoster" in Docker
+
+- `docker-stop-rm-docker-hoster.sh` stops "Docker hoster" and removes
+  its stopped container
+- `docker-stop-rm-nginx-hello-http.sh` stops all Docker containers with
+  HTTP servers and removes the stopped containers.
+- `docker-stop-rm-nginx-hello-https.sh` stops all Docker containers with
+  HTTPS servers and removes the stopped containers.
+
 
 ### Run nginx demos web servers
 ```
