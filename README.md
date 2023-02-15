@@ -309,13 +309,12 @@ cat /etc/hosts
 ./nginx-in-docker/main-gen-certs.sh nginx1.mkde0.intranet
 sudo cp ./public.crt /etc/nginx/public-0.crt
 sudo cp ./private.key /etc/nginx/private-0.key
-sudo chmod a+r /etc/nginx/private-0.key
 
 ./nginx-in-docker/main-gen-certs.sh nginx2.mkde0.intranet
 sudo cp ./public.crt /etc/nginx/public-1.crt
 sudo cp ./private.key /etc/nginx/private-1.key
-sudo chmod a+r /etc/nginx/private-1.key
 ```
+
 ### Study the new NGINX configuration
 ```
 cat ./5-virtual-hosting--tls-termination.nginx.conf
@@ -328,6 +327,96 @@ sudo nginx -s reload
 ```
 
 ### Make sure reverse proxy works as expected
+
+Running
+```
+sudo nginx -t
+``` 
+to verify NGINX configuration shows that it is. However, when try to
+access our HTTP serves via
+
+```
+w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
+w3m https://nginx2.mkde0.intranet:8443 -dump -insecure
+```
+
+we see that NGINX doesn't work as expected:
+```
+SSL error: error:0A000438:SSL routines::tlsv1 alert internal error, a workaround might be: w3m -insecure
+w3m: Can't load https://nginx1.mkde0.intranet:8443.
+```
+
+Checking logs via
+```
+sudo journalctl -u nginx|less 
+```
+shows that NGINX can't read private keys. Maybe the reason is that
+NGINX doesn't run as root? Let us check that:
+```
+systemctl show -pUser,UID,ControlGroup nginx
+```
+shows
+```
+UID=[not set]
+ControlGroup=/system.slice/nginx.service
+User=
+```
+while
+```
+sudo cat /usr/lib/systemd/system/nginx.service
+```
+shows
+```
+[Unit]
+Description=A high performance web server and a reverse proxy server
+After=network.target network-online.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+PrivateDevices=yes
+SyslogLevel=err
+
+ExecStart=/usr/bin/nginx -g 'pid /run/nginx.pid; error_log stderr;'
+ExecReload=/usr/bin/nginx -s reload
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
+```
+This clearly indicates that NGINX runs under "root" user. If so - how
+can it be that NGINX cannot read private keys?
+The answer is tricky - NGINX starts as root but then it launches child
+processes from under "http" user which doesn't have root permissions.
+Since we use "map" block in our "nginx.conf" configuration NGINX cannot
+read private keys when the master process starts (while NGINX still has
+root permissions). So reading private keys is postponed till later and
+done by the child process which doesn't have root permissions to read
+private keys.
+
+Let us make sure that this is the case by running
+```
+sudo lsof -nP -i | grep 'LISTEN'|grep 'nginx'
+```
+which shows
+
+```
+nginx     17606    root    5u  IPv4 162506      0t0  TCP *:8443 (LISTEN)
+nginx     38902    http    5u  IPv4 162506      0t0  TCP *:8443 (LISTEN)
+```
+confirming that there are two NGINX processes - the master and the child
+one and the child process runs from under "http" user.
+
+Let us now fix permissions for NGINX private keys by making "http" user
+the owner of private keys:
+
+```
+sudo chown http /etc/nginx/private-*
+```
+Permissions for public keys can remain unchanged as they are "644" by
+default (set by openssl).
+
+Now NGINX should work as expected, we can check that by running
 
 ```
 w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
