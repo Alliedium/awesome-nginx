@@ -446,7 +446,7 @@ w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
 w3m https://nginx2.mkde0.intranet:8443 -dump -insecure
 ```
 
-## Virtual Hosting with TLS termination and HTTP routing
+## 6. Virtual Hosting with TLS termination and HTTP routing
 
 In the previous example we used TLS termination and SNI routing but we
 did not make any routing decisions based on content of HTTP requestion.
@@ -459,9 +459,18 @@ cat ./6-virtual-hosting-tls-termination-http-routing.nginx.conf
 
 As you can see now we use `http` block instead of `stream`, this is
 because `http` block allows NGINX to look inside content of HTTP
-request. In general, this example is very similar to example 3 above
-with only exception that we no use port 8443 with TLS and specify
-certificates for each of the virtual hosts.
+request. We also introduce multiple upstream backends and path rewriting
+done using different methods.
+
+This time we require 6 HTTP servers:
+```
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-0
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-1
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-2
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-3
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-4
+./nginx-in-docker/docker-run-nginx-hello-http.sh hello-http-5
+```
 
 Let us generate 3 certificates;
 for the default server:
@@ -494,11 +503,23 @@ Finally, let us check that everything works as expected, starting with
 ```
 w3m https://nginx1.mkde0.intranet:8443 -dump
 w3m https://nginx1.mkde0.intranet:8443 -dump
-w3m https://nginx1.mkde0.intranet:8443 -dump
 ```
-to make sure that Round Robin load balancing is used for
+to make sure that Round Robin load balancing is used for "/" path for 
 `nginx1.mkde0.intranet`.
 
+Accessing "/alpha" and "beta" paths lead to "/" path on different backs
+as expected:
+
+```
+w3m https://nginx1.mkde0.intranet:8443/alpha -dump
+w3m https://nginx1.mkde0.intranet:8443/beta -dump
+```
+while accessing "/gamma" path leads to "/delta" path and also features
+Round Robin load balancing:
+```
+w3m https://nginx1.mkde0.intranet:8443/gamma -dump
+w3m https://nginx1.mkde0.intranet:8443/gamma -dump
+```
 The static content is available as well, this time via HTTPS:
 ```
 w3m https://nginx1.mkde0.intranet:8443/static-legacy -dump
