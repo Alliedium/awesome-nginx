@@ -1,8 +1,9 @@
 #!/bin/sh
+BASEDIR=$(dirname "$0")
 openssl x509 -req \
     -days 3650 \
-    -in private.csr \
-    -signkey private.key \
-    -out public.crt \
+    -in $BASEDIR/private.csr \
+    -signkey $BASEDIR/private.key \
+    -out $BASEDIR/public.crt \
     -extensions req_ext \
-    -extfile ssl.conf
+    -extfile $BASEDIR/ssl.conf

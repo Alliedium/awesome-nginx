@@ -1,2 +1,3 @@
 #!/bin/sh
-openssl x509 -in ./public.crt --text
+BASEDIR=$(dirname "$0")
+openssl x509 -in $BASEDIR/public.crt --text

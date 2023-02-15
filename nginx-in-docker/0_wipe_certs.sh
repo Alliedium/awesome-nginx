@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
-rm ./private.key || true
-rm ./private.csr || true
-rm ./public.crt || true
+BASEDIR=$(dirname "$0")
+rm $BASEDIR/private.key || true
+rm $BASEDIR/private.csr || true
+rm $BASEDIR/public.crt || true

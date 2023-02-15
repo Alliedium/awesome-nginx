@@ -79,7 +79,16 @@ sudo nginx -s reload
 #    this is the same as 
 # sudo systemctl reload nginx
 ```
-Then make sure it works as expected
+We can also check NGINX configuration via 
+```
+sudo nginx -t
+```
+or 
+```
+sudo nginx -T
+```
+
+Then let us make sure it works as expected:
 ```
 w3m http://127.0.0.1:8080 -dump
 w3m http://nginx1.mkde0.intranet:8080 -dump
@@ -291,7 +300,7 @@ w3m https://hello-https-0.mkde0.intranet:8443 -insecure -dump
 w3m https://hello-https-1.mkde0.intranet:8443 -insecure -dump
 ```
 
-## 5. Virtual Hosting with TLS termination
+## 5. Virtual Hosting with TLS termination and no HTTP routing
 
 ### Run HTTP backend severs
 ```
@@ -316,6 +325,20 @@ sudo cp ./private.key /etc/nginx/private-1.key
 ```
 
 ### Study the new NGINX configuration
+In the previous example we used `$ssl_preread_server_name` and it was ok
+because this variable was available at the time we used it to forward
+our requests to corresponding backend server. However, in case of TLS
+termination we cannot use this variable in `map` block to map server
+names to certificates used by NGINX (assuming we want different
+certificate for each server name). This is because
+`$ssl_preread_server_name` is not available at the time we read our
+certification. To work around that we need to use `$ssl_server_name`
+variable of NGINX to make it so NGINX extracts server_name from
+certificates and compares that server than with client certification.
+`ssl_preread on` is no longer necessary as well (because it just makes
+`$ssl_preread_server_name` variable available).
+We do not make routing decisions based on HTTP protocol which is why we
+still use `stream` blocok (as in the previous example).
 ```
 cat ./5-virtual-hosting--tls-termination.nginx.conf
 ```
@@ -423,6 +446,70 @@ w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
 w3m https://nginx2.mkde0.intranet:8443 -dump -insecure
 ```
 
+## Virtual Hosting with TLS termination and HTTP routing
+
+In the previous example we used TLS termination and SNI routing but we
+did not make any routing decisions based on content of HTTP requestion.
+Let us consider a new example that adds HTTP routing on top of what we
+had in the previous example:
+
+```
+cat ./6-virtual-hosting-tls-termination-http-routing.nginx.conf
+```
+
+As you can see now we use `http` block instead of `stream`, this is
+because `http` block allows NGINX to look inside content of HTTP
+request. In general, this example is very similar to example 3 above
+with only exception that we no use port 8443 with TLS and specify
+certificates for each of the virtual hosts.
+
+Let us generate 3 certificates;
+for the default server:
+``` 
+./nginx-in-docker/main-gen-certs.sh "*"
+sudo cp ./private.key /etc/nginx/private-default.key 
+sudo cp ./public.crt /etc/nginx/public-default.crt
+```
+for `nginx1.mkde0.intranet`
+```
+./nginx-in-docker/main-gen-certs.sh "nginx1.mkde0.intranet"
+sudo cp ./private.key /etc/nginx/private-0.key 
+sudo cp ./public.crt /etc/nginx/public-0.crt
+```
+and for `nginx2.mkde0.intranet`
+```
+./nginx-in-docker/main-gen-certs.sh "nginx2.mkde0.intranet"
+sudo cp ./private.key /etc/nginx/private-1.key 
+sudo cp ./public.crt /etc/nginx/public-1.crt
+```
+
+Let us apply the new configuration
+
+```
+sudo cp /6-virtual-hosting-tls-termination-http-routing.nginx.conf /etc/nginx/nginx.conf
+sudo nginx -s reload
+```
+
+Finally, let us check that everything works as expected, starting with 
+```
+w3m https://nginx1.mkde0.intranet:8443 -dump
+w3m https://nginx1.mkde0.intranet:8443 -dump
+w3m https://nginx1.mkde0.intranet:8443 -dump
+```
+to make sure that Round Robin load balancing is used for
+`nginx1.mkde0.intranet`.
+
+The static content is available as well, this time via HTTPS:
+```
+w3m https://nginx1.mkde0.intranet:8443/static-legacy -dump
+w3m https://nginx2.mkde0.intranet:8443 -dump
+```
+As we can see in this particular example, when we specify certificates
+exmplicitly (instead of using `map` block) via `ssl_certificate` and 
+`ssl_certificate_key` directives we do not need to make `http` user an
+owner of private keys as in example 5 above. This is because in this
+case certificates are read by the master process that runs from under
+"root" account.
 
 ## References
 ### Docker

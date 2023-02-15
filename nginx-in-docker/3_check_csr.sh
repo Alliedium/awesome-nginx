@@ -1,2 +1,3 @@
 #!/bin/sh
-openssl req -text -noout -in private.csr
+BASEDIR=$(dirname "$0")
+openssl req -text -noout -in $BASEDIR/private.csr
