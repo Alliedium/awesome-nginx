@@ -119,13 +119,13 @@ w3m http://nginx2.mkde0.intranet:8080 -dump
 Let us have a look at NGINX-Demos/nginx-hello docker image and study how
 it configures NGINX by looking at
 
-https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
-https://github.com/nginxinc/NGINX-Demos/blob/master/nginx-hello/hello.conf
+- https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
+- https://github.com/nginxinc/NGINX-Demos/blob/master/nginx-hello/hello.conf
 
 Also let us refer to 
 
-https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
-http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
+- https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/
+- http://nginx.org/en/docs/http/ngx_http_sub_module.html#example
 
 ### Study helper scripts for running NGINX in Docker 
 All the scripts are in `./nginx-in-docker` folder. Here is what
@@ -316,12 +316,12 @@ cat /etc/hosts
 ### Let us generate two self-signed certificates
 ```
 ./nginx-in-docker/main-gen-certs.sh nginx1.mkde0.intranet
-sudo cp ./public.crt /etc/nginx/public-0.crt
-sudo cp ./private.key /etc/nginx/private-0.key
+sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-0.crt
+sudo cp ./nginx-in-docker/private.key /etc/nginx/private-0.key
 
 ./nginx-in-docker/main-gen-certs.sh nginx2.mkde0.intranet
-sudo cp ./public.crt /etc/nginx/public-1.crt
-sudo cp ./private.key /etc/nginx/private-1.key
+sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-1.crt
+sudo cp ./nginx-in-docker/private.key /etc/nginx/private-1.key
 ```
 
 ### Study the new NGINX configuration
@@ -345,7 +345,7 @@ cat ./5-virtual-hosting--tls-termination.nginx.conf
 
 ### Apply the new configuration 
 ```
-sudo cp ./5-virtual-hosting--tls-termination.nginx.conf /etc/nginx/
+sudo cp ./5-virtual-hosting-tls-termination.nginx.conf /etc/nginx/nginx.conf
 sudo nginx -s reload
 ```
 
@@ -476,20 +476,20 @@ Let us generate 3 certificates;
 for the default server:
 ``` 
 ./nginx-in-docker/main-gen-certs.sh "*"
-sudo cp ./private.key /etc/nginx/private-default.key 
-sudo cp ./public.crt /etc/nginx/public-default.crt
+sudo cp ./nginx-in-docker/private.key /etc/nginx/private-default.key 
+sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-default.crt
 ```
 for `nginx1.mkde0.intranet`
 ```
 ./nginx-in-docker/main-gen-certs.sh "nginx1.mkde0.intranet"
-sudo cp ./private.key /etc/nginx/private-0.key 
-sudo cp ./public.crt /etc/nginx/public-0.crt
+sudo cp ./nginx-in-docker/private.key /etc/nginx/private-0.key 
+sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-0.crt
 ```
 and for `nginx2.mkde0.intranet`
 ```
 ./nginx-in-docker/main-gen-certs.sh "nginx2.mkde0.intranet"
-sudo cp ./private.key /etc/nginx/private-1.key 
-sudo cp ./public.crt /etc/nginx/public-1.crt
+sudo cp ./nginx-in-docker/private.key /etc/nginx/private-1.key 
+sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-1.crt
 ```
 
 Let us apply the new configuration
