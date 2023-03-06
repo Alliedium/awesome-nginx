@@ -10,10 +10,10 @@ if [[ -z "$2" ]] ; then
     exit 1
 fi
 image_name=$1
-host_name="$(hostname -s)"
+HOST_NAME="devops-host"
 container_name="$2"
 DOMAIN_NAME="intranet"
-common_name=$container_name.$host_name.$DOMAIN_NAME
+common_name=$container_name.$HOST_NAME.$DOMAIN_NAME
 docker run -d --name "$container_name" \
 	--hostname "$container_name" \
         -e "COMMON_NAME=$common_name" \

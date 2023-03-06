@@ -48,16 +48,11 @@ sudo pacman -S nginx
 sudo systemctl enable nginx --now
 ```
 
-### Disclaimer
-All examples below assume the host name is "mkde0". Please make sure to
-adjust all commands for your host by replacing "mkde0" with your host
-name (use "hostname -s" to see your hostname).
-
 ### Modify `/etc/hosts`:
 ```
-sudo sh -c 'echo "127.0.0.1 nginx1.mkde0.intranet" >> /etc/hosts'
-sudo sh -c 'echo "127.0.0.1 nginx2.mkde0.intranet" >> /etc/hosts'
-sudo sh -c 'echo "127.0.0.1 nginx3.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx1.devops-host.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx2.devops-host.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 nginx3.devops-host.intranet" >> /etc/hosts'
 ```
 ### Run Docker Hoster
 to automatically map container names to their IPs:
@@ -91,7 +86,7 @@ sudo nginx -T
 Then let us make sure it works as expected:
 ```
 w3m http://127.0.0.1:8080 -dump
-w3m http://nginx1.mkde0.intranet:8080 -dump
+w3m http://nginx1.devops-host.intranet:8080 -dump
 ```
 
 ## 2. Virtual hosting with static pages
@@ -110,8 +105,8 @@ sudo sed -i "s/nginx/nginx2/g" /usr/share/nginx/html/index2.html
 sudo nginx -s reload
 
 w3m http://127.0.0.1:8080 -dump
-w3m http://nginx1.mkde0.intranet:8080 -dump
-w3m http://nginx2.mkde0.intranet:8080 -dump
+w3m http://nginx1.devops-host.intranet:8080 -dump
+w3m http://nginx2.devops-host.intranet:8080 -dump
 ```
 
 ## 3. HTTP load balancing
@@ -137,7 +132,7 @@ each of the script does:
 
 - `docker-run-nginx-hello-https.sh "hello-https-0"` launches HTTPS 
   sever with DNS name "hello-https-0" and self-signed certificate issued
-  for "hello-https-0.mkde0.intranet" in Docker container named
+  for "hello-https-0.devops-host.intranet" in Docker container named
   "hello-https-0" on port 443
 
 - `docker-run-docker-hoster.sh` runs "Docker hoster" in Docker
@@ -221,15 +216,15 @@ w3m http://127.0.0.1:8080 -dump
 
 while Round Robin algorithm works as expected:
 ```
-w3m http://nginx1.mkde0.intranet:8080 -dump
-w3m http://nginx1.mkde0.intranet:8080 -dump
-w3m http://nginx1.mkde0.intranet:8080 -dump
+w3m http://nginx1.devops-host.intranet:8080 -dump
+w3m http://nginx1.devops-host.intranet:8080 -dump
+w3m http://nginx1.devops-host.intranet:8080 -dump
 ```
 
 The static content is available as well:
 ```
-w3m http://nginx1.mkde0.intranet:8080/static-legacy -dump
-w3m http://nginx2.mkde0.intranet:8080 -dump
+w3m http://nginx1.devops-host.intranet:8080/static-legacy -dump
+w3m http://nginx2.devops-host.intranet:8080 -dump
 ```
 
 ## 4. Nginx HTTPS Virtual Hosting with SNI without TLS termination
@@ -289,15 +284,15 @@ sudo nginx -s reload
 ### Add 2 external FQDNs for NGINX to hosts file:
 
 ```
-sudo sh -c 'echo "127.0.0.1 hello-https-0.mkde0.intranet" >> /etc/hosts'
-sudo sh -c 'echo "127.0.0.1 hello-https-1.mkde0.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 hello-https-0.devops-host.intranet" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 hello-https-1.devops-host.intranet" >> /etc/hosts'
 ```
 
 ### Let us check how SNI works
 
 ```
-w3m https://hello-https-0.mkde0.intranet:8443 -insecure -dump
-w3m https://hello-https-1.mkde0.intranet:8443 -insecure -dump
+w3m https://hello-https-0.devops-host.intranet:8443 -insecure -dump
+w3m https://hello-https-1.devops-host.intranet:8443 -insecure -dump
 ```
 
 ## 5. Virtual Hosting with TLS termination and no HTTP routing
@@ -315,11 +310,11 @@ cat /etc/hosts
 
 ### Let us generate two self-signed certificates
 ```
-./nginx-in-docker/main-gen-certs.sh nginx1.mkde0.intranet
+./nginx-in-docker/main-gen-certs.sh nginx1.devops-host.intranet
 sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-0.crt
 sudo cp ./nginx-in-docker/private.key /etc/nginx/private-0.key
 
-./nginx-in-docker/main-gen-certs.sh nginx2.mkde0.intranet
+./nginx-in-docker/main-gen-certs.sh nginx2.devops-host.intranet
 sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-1.crt
 sudo cp ./nginx-in-docker/private.key /etc/nginx/private-1.key
 ```
@@ -340,7 +335,7 @@ certificates and compares that server than with client certification.
 We do not make routing decisions based on HTTP protocol which is why we
 still use `stream` blocok (as in the previous example).
 ```
-cat ./5-virtual-hosting--tls-termination.nginx.conf
+cat ./5-virtual-hosting-tls-termination.nginx.conf
 ```
 
 ### Apply the new configuration 
@@ -359,14 +354,14 @@ to verify NGINX configuration shows that it is. However, when try to
 access our HTTP serves via
 
 ```
-w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
-w3m https://nginx2.mkde0.intranet:8443 -dump -insecure
+w3m https://nginx1.devops-host.intranet:8443 -dump -insecure
+w3m https://nginx2.devops-host.intranet:8443 -dump -insecure
 ```
 
 we see that NGINX doesn't work as expected:
 ```
 SSL error: error:0A000438:SSL routines::tlsv1 alert internal error, a workaround might be: w3m -insecure
-w3m: Can't load https://nginx1.mkde0.intranet:8443.
+w3m: Can't load https://nginx1.devops-host.intranet:8443.
 ```
 
 Checking logs via
@@ -442,8 +437,8 @@ default (set by openssl).
 Now NGINX should work as expected, we can check that by running
 
 ```
-w3m https://nginx1.mkde0.intranet:8443 -dump -insecure
-w3m https://nginx2.mkde0.intranet:8443 -dump -insecure
+w3m https://nginx1.devops-host.intranet:8443 -dump -insecure
+w3m https://nginx2.devops-host.intranet:8443 -dump -insecure
 ```
 
 ## 6. Virtual Hosting with TLS termination and HTTP routing
@@ -479,15 +474,15 @@ for the default server:
 sudo cp ./nginx-in-docker/private.key /etc/nginx/private-default.key 
 sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-default.crt
 ```
-for `nginx1.mkde0.intranet`
+for `nginx1.devops-host.intranet`
 ```
-./nginx-in-docker/main-gen-certs.sh "nginx1.mkde0.intranet"
+./nginx-in-docker/main-gen-certs.sh "nginx1.devops-host.intranet"
 sudo cp ./nginx-in-docker/private.key /etc/nginx/private-0.key 
 sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-0.crt
 ```
-and for `nginx2.mkde0.intranet`
+and for `nginx2.devops-host.intranet`
 ```
-./nginx-in-docker/main-gen-certs.sh "nginx2.mkde0.intranet"
+./nginx-in-docker/main-gen-certs.sh "nginx2.devops-host.intranet"
 sudo cp ./nginx-in-docker/private.key /etc/nginx/private-1.key 
 sudo cp ./nginx-in-docker/public.crt /etc/nginx/public-1.crt
 ```
@@ -501,29 +496,29 @@ sudo nginx -s reload
 
 Finally, let us check that everything works as expected, starting with 
 ```
-w3m https://nginx1.mkde0.intranet:8443 -dump
-w3m https://nginx1.mkde0.intranet:8443 -dump
+w3m https://nginx1.devops-host.intranet:8443 -dump
+w3m https://nginx1.devops-host.intranet:8443 -dump
 ```
 to make sure that Round Robin load balancing is used for "/" path for 
-`nginx1.mkde0.intranet`.
+`nginx1.devops-host.intranet`.
 
 Accessing "/alpha" and "beta" paths lead to "/" path on different backs
 as expected:
 
 ```
-w3m https://nginx1.mkde0.intranet:8443/alpha -dump
-w3m https://nginx1.mkde0.intranet:8443/beta -dump
+w3m https://nginx1.devops-host.intranet:8443/alpha -dump
+w3m https://nginx1.devops-host.intranet:8443/beta -dump
 ```
 while accessing "/gamma" path leads to "/delta" path and also features
 Round Robin load balancing:
 ```
-w3m https://nginx1.mkde0.intranet:8443/gamma -dump
-w3m https://nginx1.mkde0.intranet:8443/gamma -dump
+w3m https://nginx1.devops-host.intranet:8443/gamma -dump
+w3m https://nginx1.devops-host.intranet:8443/gamma -dump
 ```
 The static content is available as well, this time via HTTPS:
 ```
-w3m https://nginx1.mkde0.intranet:8443/static-legacy -dump
-w3m https://nginx2.mkde0.intranet:8443 -dump
+w3m https://nginx1.devops-host.intranet:8443/static-legacy -dump
+w3m https://nginx2.devops-host.intranet:8443 -dump
 ```
 As we can see in this particular example, when we specify certificates
 exmplicitly (instead of using `map` block) via `ssl_certificate` and 
@@ -531,6 +526,204 @@ exmplicitly (instead of using `map` block) via `ssl_certificate` and
 owner of private keys as in example 5 above. This is because in this
 case certificates are read by the master process that runs from under
 "root" account.
+
+
+## 7. Virtual hosting with LetsEncrypt TLS certificate generated by certbot with HTTP-01 challange
+
+### Update Nginx configuration
+
+Let us look at the new configuration:
+```
+cat ./7-virtual-hosting-static-tls-certbot-http-01.nginx.conf
+```
+
+we see that we have 3 virtual hosts:
+- `nginx.devops-host.intranet`
+- `nginx0-manjaro.devopshive.link` 
+- `nginx1-manjaro.devopshive.link` 
+
+ The first one is configured similarly to the second example while the remaining two will be reachable from outside once we register our domain name and configure AWS Route53 and our firewall to make our NGINX reachable from internet.
+
+* Please note that `devopshive.link` is used purely as an example, you should pick and register your own domain name so that `nginx0-manjaro.devopshive.link` looks like `nginx0-manjaro.your-domain-name` in your case.
+
+After applying the new configuration
+
+```
+sudo cp ./7-virtual-hosting-static-tls-certbot-http-01.nginx.conf /etc/nginx/nginx.conf
+sudo cp /usr/share/nginx/html/index.html /usr/share/nginx/html/index0.html
+sudo sed -i "s/nginx/nginx0/g" /usr/share/nginx/html/index0.html
+sudo cp /usr/share/nginx/html/index.html /usr/share/nginx/html/index1.html
+sudo sed -i "s/nginx/nginx1/g" /usr/share/nginx/html/index1.html
+sudo nginx -s reload
+```
+
+and running 
+```
+w3m http://nginx.devops-host.intranet:8080 -dump
+```
+we see the static "nginx" webpage loaded 
+while trying to run
+
+```
+w3m http://nginx0-manjaro.devopshive.link:8080 -dump
+w3m http://nginx1-manjaro.devopshive.link:8080 -dump
+```
+would result in error because the domain name is not registed yet.
+
+### Make sure that nginx running on your Manjaro host is reachable from other VMs on the same network. 
+Prior to registering `nginx0-manjaro.devopshive.link` domain name we need to make sure that we can reach our NGINX from at least other VM in the same subnet. 
+Our Manjaro host uses iptables that works as a firewall and might prevent us from exposing NGINX to the internet.  
+Let us configure iptables first to make sure it doesn't block our HTTP and HTTPS connections from ouside the host.
+As the first step please read https://docs.docker.com/network/iptables/ and make sure you understand how iptables chains work when Docker is installed.
+Then run `sudo iptables -S` and to avoid problems with iptables blocking nginx make sure you have
+```
+-A OUTPUT  -j ACCEPT 
+``` 
+as the first rule in "OUTPUT" rule group, 
+```
+-A INPUT -j ACCEPT
+```
+as the first group in "INPUT" rule group
+and 
+```
+-A DOCKER-USER -j ACCEPT
+```
+in "DOCKER-USER" group.
+
+This will make sure that iptables doesn't block anything from/to our Manjaro host. Please note that such unsecure way of configuring iptables is only acceptable for development purposes. For production you should carefully fine-tune your iptables rules to expose only your services and nothing else (along with introducing other security best-practices).
+
+The easiest way to modify the rules and make the changes persistent is to edit `/etc/iptables/iptables.rules` file by adding the lines above to corresponding places inside the file
+and then running
+```
+sudo iptables-restore < /etc/iptables/iptables.rules
+```
+This way the rules are re-loaded by `iptables` systemd service (you can check that via running `sudo systemctl status iptables`).
+
+You can also add the following line
+
+```
+-A INPUT -p tcp -m multiport --dports 8080,8443 -m state --state NEW -j LOG --log-prefix "New Connection " --log-level 6
+```
+to the top of ` /etc/iptables/iptables.rules` 
+
+and then use
+```
+sudo journalctl -k -f
+```
+to see logs of new HTTP and HTTPS connections on ports 8080 and 8443 correspondigly.
+
+Once all this is done run the following commands from another VM in the same subnet to make sure that 
+
+### Register a new domain using Route53 
+An important prerequisite to this step is having a pubic IP address allocated to you by your internet provider.
+Please follow the instructions from https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
+and make sure that you add "A" record "nginx0-manjaro.devopshive.link" in the hosted zone (which is created automatically) pointing to your public IP.
+
+You can either run
+```
+nslookup nginx0-manjaro.devopshive.link
+```
+or
+```
+dig nginx0-manjaro.devopshive.link
+```
+Please note that both `dig` and `nslookup` require `bind` package installed:
+```
+sudo pacman -S bind
+```
+This can be checked via
+```
+sudo pacman -Fy 
+sudo pacman -F dig
+sudo pacman -F bind
+```
+(see https://wiki.archlinux.org/title/Pacman#Search_for_a_package_that_contains_a_specific_file for details).
+
+
+### Expose ports 8443 and 8080 on NGINX host to internet
+
+We already checked that we can reach NGINX on our Manjaro host from other VM so now let us configure our home lab firewall and expose port 8080 on public IPs port 80 and port 8443 - on public IPs port 7443. The exact way to do it greatly deepends on your infrastructure and your hardware manufacturer but usually configuration can be done by creating entries in firewall and port forwarding sections on your home lab router.
+
+The reason we expose port 8080 on public IPs port 80 (and not 7808 for intance) is requirement of ACME server for HTTP-01 challange to be able to reach our webserver on exactly port 80.
+
+### Install certbot along with certbot nginx plugin:
+Install the plugin
+```  
+sudo pacman -S certbot certbot-nginx
+certbot plugins # just to see which plugins are installed
+```
+and study its parameters
+
+ ```
+certbot --help nginx
+certbot --help all
+```
+
+### Issue certifiates via certbot with HTTP-01 challange
+
+Let us finally trigger an automatic issuing and installation of certificates: 
+
+```
+sudo certbot run --nginx -d nginx0-manjaro.devopshive.link -d nginx1-manjaro.devopshive.link --http-01-port 8080 --https-port 8443 # you can skip "run" and write just certbot ....
+sudo nginx -s reload
+```
+
+This will automatically identify appropriate places inside our `nginx.conf` and specify certificates for both of the virtual hosts.
+
+Please mind the parameters `--http-01-port` and `--https-port`, the first tells certbot that for HTTP NGINX listens on 8080 instead of standard port 80 while the second one forces certbot to configure TLS on port 8443 instead of of standard 443 (which is what we need because we agreed earlier that we use 8080 for HTTP and 8443 for HTTPS). It is important to realize that `--http-01-port` doesn't change the port which ACME sever tries to access for HTTP-01 challange.
+
+
+Alternatively we could have run
+
+```
+ sudo certbot run --nginx -d nginx0-manjaro.devopshive.link  --http-01-port 8080 --https-port 8443
+ sudo certbot run --nginx -d nginx0-manjaro.devopshive.link -d nginx1-manjaro.devopshive.link --http-01-port 8080 --https-port 8443
+ sudo nginx -s reload
+```
+
+in which case the first command would have generated the certificate only for one of the domain names while the second one would extend the certificate to the second name.
+
+Now we can also see the certificates managed by certbot:
+```
+sudo certbot certificates # this should output one certificate for two domains
+```
+
+or delete the certificate (DO NOT RUN THAT PLEASE until you complete all the steps for this example)
+
+```
+certbot delete --cert-name nginx0-manjaro.devopshive.link
+sudo certbot certificates
+```
+
+Finally, you can trigger simulate renewal (renewal) certificate(s) with just one command:
+
+```
+sudo certbot renew --dry-run # remove '--dry-run' to perform actual renewal
+```
+
+Please mind the LetsEncrypt rate limits (https://letsencrypt.org/docs/rate-limits/)!
+
+
+### Check that all works as expected
+
+by running
+
+```
+w3m https://nginx0-manjaro.devopshive.link:7443 -dump
+w3m https://nginx1-manjaro.devopshive.link:7443 -dump
+```
+
+Please note that we do not need `-insecure` flag anymore!
+
+### Scheduling periodic renewal
+Follow steps from https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/#auto-renewal
+
+## 8. Virtual hosting with LetsEncrypt TLS certificate generated by certbot with DNS-01 challange
+
+```
+  sudo pacman -S certbot-dns-route53
+```
+
 
 ## References
 ### Docker
