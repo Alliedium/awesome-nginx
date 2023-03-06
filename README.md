@@ -611,6 +611,11 @@ and then use
 sudo journalctl -k -f
 ```
 to see logs of new HTTP and HTTPS connections on ports 8080 and 8443 correspondigly.
+Alternatively you could use `tcpdump -i any port 8443 or port 8080 -n` to
+monitor HTTP and HTTPS traffic. This approach, however, requires 
+special syntax to show only new connections to make the output less
+bloated (see
+https://serverfault.com/questions/798745/tcpdump-capture-new-connections-only). 
 
 Once all this is done run the following commands from another VM in the same subnet to make sure that 
 
