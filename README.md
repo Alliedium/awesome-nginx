@@ -444,7 +444,7 @@ w3m https://nginx2.devops-host.intranet:8443 -dump -insecure
 ## 6. Virtual Hosting with TLS termination and HTTP routing
 
 In the previous example we used TLS termination and SNI routing but we
-did not make any routing decisions based on content of HTTP requestion.
+did not make any routing decisions based on content of HTTP request.
 Let us consider a new example that adds HTTP routing on top of what we
 had in the previous example:
 
