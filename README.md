@@ -619,6 +619,11 @@ https://serverfault.com/questions/798745/tcpdump-capture-new-connections-only).
 
 Once all this is done run the following commands from another VM in the same subnet to make sure that 
 
+### Make sure that our hypervisor firewall (if enabled) is configured to
+pass through incoming HTTP and HTTPS connections
+
+See https://pve.proxmox.com/wiki/Firewall
+
 ### Register a new domain using Route53 
 An important prerequisite to this step is having a pubic IP address allocated to you by your internet provider.
 Please follow the instructions from https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
