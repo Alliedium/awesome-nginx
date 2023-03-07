@@ -688,7 +688,6 @@ Let us finally trigger an automatic issuing and installation of certificates:
 
 ```
 sudo certbot run --nginx -d nginx0-manjaro.devopshive.link -d nginx1-manjaro.devopshive.link --http-01-port 8080 --https-port 8443 # you can skip "run" and write just certbot ....
-sudo nginx -s reload
 ```
 
 This will automatically identify appropriate places inside our `nginx.conf` and specify certificates for both of the virtual hosts.
@@ -699,9 +698,8 @@ Please mind the parameters `--http-01-port` and `--https-port`, the first tells 
 Alternatively we could have run
 
 ```
- sudo certbot run --nginx -d nginx0-manjaro.devopshive.link  --http-01-port 8080 --https-port 8443
- sudo certbot run --nginx -d nginx0-manjaro.devopshive.link -d nginx1-manjaro.devopshive.link --http-01-port 8080 --https-port 8443
- sudo nginx -s reload
+sudo certbot run --nginx -d nginx0-manjaro.devopshive.link  --http-01-port 8080 --https-port 8443
+sudo certbot run --nginx -d nginx0-manjaro.devopshive.link -d nginx1-manjaro.devopshive.link --http-01-port 8080 --https-port 8443
 ```
 
 in which case the first command would have generated the certificate only for one of the domain names while the second one would extend the certificate to the second name.
