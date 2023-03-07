@@ -655,6 +655,19 @@ sudo pacman -F bind
 We already checked that we can reach NGINX on our Manjaro host from other VM so now let us configure our home lab firewall and expose port 8080 on public IPs port 80 and port 8443 - on public IPs port 7443. The exact way to do it greatly deepends on your infrastructure and your hardware manufacturer but usually configuration can be done by creating entries in firewall and port forwarding sections on your home lab router.
 
 The reason we expose port 8080 on public IPs port 80 (and not 7808 for intance) is requirement of ACME server for HTTP-01 challange to be able to reach our webserver on exactly port 80.
+As a result our port mapping will look like this:
+
+```
+7443 -> 8443
+80   -> 8080
+```
+
+Please note that LetsEncrypt doesn't provide a list of public IP
+addresses used for certificate validation (see
+https://letsencrypt.org/docs/faq/) which means we are forced to
+keep our web server's port 80 opened to the whole internet to allow
+HTTP-01 validation. If it is a problem you then you might be interested
+in DNS-01 validation (see section 8 below).
 
 ### Install certbot along with certbot nginx plugin:
 Install the plugin
@@ -756,3 +769,9 @@ Follow steps from https://www.nginx.com/blog/using-free-ssltls-certificates-from
 - https://hub.docker.com/r/nginxdemos/hello/
 - https://www.youtube.com/watch?v=7VAI73roXaY
 - https://levelup.gitconnected.com/multiplex-tls-traffic-with-sni-routing-ece1e4e43e56
+- https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
+- https://letsencrypt.org/docs/challenge-types/
+- https://docs.docker.com/network/iptables/
+- https://letsencrypt.org/docs/rate-limits/
+- https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/#auto-renewal
+- https://nandovieira.com/using-lets-encrypt-in-development-with-nginx-and-aws-route53
