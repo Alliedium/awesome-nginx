@@ -836,7 +836,7 @@ configured correctly. It is recommended to use AWS CLI v2 which can be
 installed via
 
 ```
-sudo pacman -S aws-cli # remove AWS CLI v1 if it is intalled
+sudo pacman -R aws-cli # remove AWS CLI v1 if it is intalled
 sudo pacman -S aws-cli-v2
 ```
 Once AWS CLI is installed you can run
@@ -862,7 +862,7 @@ fails to HTTP-01 challange just in case.
 Now it is time to generate LetsEncrypt certificate via `certbot` using
 DNS-01 challange:
 ```
-certbot certonly --dns-route53 -d nginx2-manjaro.devopshive.link -d nginx3-manjaro.devopshive.link --preferred-challenges=dns
+sudo certbot certonly --dns-route53 -d nginx2-manjaro.devopshive.link -d nginx3-manjaro.devopshive.link --preferred-challenges=dns
 ```
 This command (may take a few seconds to run) generates a certificate at
 ```
