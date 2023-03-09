@@ -713,7 +713,7 @@ sudo certbot certificates # this should output one certificate for two domains
 or delete the certificate (DO NOT RUN THAT PLEASE until you complete all the steps for this example)
 
 ```
-certbot delete --cert-name nginx0-manjaro.devopshive.link
+sudo certbot delete --cert-name nginx0-manjaro.devopshive.link
 sudo certbot certificates
 ```
 
@@ -937,7 +937,11 @@ to `ExecStart` command in
 /usr/lib/systemd/system/nginx.service
 ```
 to make sure that NGIXN configuration is reloaded automatically after
-the certificate renewal.
+the certificate renewal. After that please do not forget to run
+```
+sudo systemctl daemon-reload
+```
+so that systemd picks up your changes.
 
 ## References
 ### Docker
