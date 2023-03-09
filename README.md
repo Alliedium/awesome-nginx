@@ -812,6 +812,7 @@ refer to https://scaron.info/blog/improve-your-nginx-ssl-configuration.html for 
 for 
 - 'nginx2-manjaro.devopshive.link'
 - 'nginx3-manjaro.devopshive.link'
+
 that map each of the names to our public IP address
 
 Please follow instructions from https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create these
