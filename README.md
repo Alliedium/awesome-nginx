@@ -683,6 +683,22 @@ certbot --help nginx
 certbot --help all
 ```
 
+### Registering LetsEncrypt account
+Lets Encrypt account is used for remembering expiration dates of certificates issued to user and notifying them about certificates that are close to expiration. Under normal circumstances certificates should not get too close to expiration if automatic certificate renewal is configured correctly (see below). However, if this happens, LetsEncrypt needs to know an email address to send the expiration warning emails to (see https://letsencrypt.org/docs/expiration-emails/ and https://community.letsencrypt.org/t/what-is-the-email-used-for-when-i-run-certbot-at-the-first-time/119911 for details). 
+
+There are 2 ways to perform LetsEncrypt account registration:
+#### a) Registering LetsEncrypt account explicitly
+either via 
+```
+sudo certbot register --email you-email@address.com # the provided email will be used for expiration warning emails
+```
+or via providing `--register-unsafely-without-email` which  enables registering an account with no email address. Acording to the `certbot` documentation this is strongly discouraged, because you will be unable to receive notice about impending expiration or revocation of your certificates or problems with your Certbot installation that will lead to failure to renew.
+
+#### b) Registering LetsEncrypt account implicitly
+via providing either `--email` parameter or `--register-unsafely-without-email` to the first call of `certbot run` or `certbot certonly` or just `certbot` command.
+
+Either of the methods above makes certbot remember the LetsEncrypt account details on your machine and you are no longer required to provide neither `--email` nor `--register-unsafely-without-email` for all subsequent calls on certbot (on that particular machine).
+
 ### Issue certifiates via certbot with HTTP-01 challange
 
 Let us finally trigger an automatic issuing and installation of certificates: 
