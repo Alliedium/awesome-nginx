@@ -802,7 +802,7 @@ ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECD
 ```
 along with
 ```
-ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 ```
 both of which are used to improve security of our NGINX configuration. Please
 refer to https://scaron.info/blog/improve-your-nginx-ssl-configuration.html for explanation of each of the parameters.
