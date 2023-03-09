@@ -626,7 +626,7 @@ See https://pve.proxmox.com/wiki/Firewall
 
 ### Register a new domain using Route53 
 An important prerequisite to this step is having a pubic IP address allocated to you by your internet provider.
-Please follow the instructions from https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
+Please follow the instructions from https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
 and make sure that you add "A" record "nginx0-manjaro.devopshive.link" in the hosted zone (which is created automatically) pointing to your public IP.
 
 You can either run
@@ -815,13 +815,13 @@ for
 
 that map each of the names to our public IP address
 
-Please follow instructions from https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create these
+Please follow instructions from https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create these
 records in Route53
 
 ### Create IAM bot user with programmatic access to Route53
 `certbot` will require a special user with programmatic access only that
 has permissions to create and delete records in our new hosted zone.
-Please following instuctions from https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create the user
+Please following instuctions from https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create the user
 but make sure to use this policy: https://certbot-dns-route53.readthedocs.io/en/stable/#sample-aws-policy-json (you need to replace "YOURHOSTEDZONEID" with your hosted zone id).
 Then you need to generate credentials for programmatic access and put
 them into `~/.aws/config` according
@@ -966,7 +966,7 @@ so that systemd picks up your changes.
 - https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-hello
 - https://www.youtube.com/watch?v=7VAI73roXaY
 - https://levelup.gitconnected.com/multiplex-tls-traffic-with-sni-routing-ece1e4e43e56
-- https://github.com/Alliedium/devops-course-2022/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
+- https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md
 - https://letsencrypt.org/docs/challenge-types/
 - https://letsencrypt.org/docs/rate-limits/
 - https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/#auto-renewal
