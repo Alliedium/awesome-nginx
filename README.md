@@ -845,7 +845,7 @@ records in Route53
 ### Create IAM bot user with programmatic access to Route53
 `certbot` will require a special user with programmatic access only that
 has permissions to create and delete records in our new hosted zone.
-Please following instuctions from https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create the user
+Please follow instuctions from https://github.com/Alliedium/awesome-devops/blob/main/17_networks_ssl-termination_acme_route53_06-oct-2022/README.md to create the user
 but make sure to use this policy: https://certbot-dns-route53.readthedocs.io/en/stable/#sample-aws-policy-json (you need to replace "YOURHOSTEDZONEID" with your hosted zone id).
 Then you need to generate credentials for programmatic access and put
 them into `~/.aws/config` according
