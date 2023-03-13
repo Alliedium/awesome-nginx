@@ -699,6 +699,17 @@ via providing either `--email` parameter or `--register-unsafely-without-email` 
 
 Either of the methods above makes certbot remember the LetsEncrypt account details on your machine and you are no longer required to provide neither `--email` nor `--register-unsafely-without-email` for all subsequent calls on certbot (on that particular machine).
 
+### Rate limits and staging environment
+Lets Encrypt enforces rate limits to allow for the service to be used
+by as many people as possible - see https://letsencrypt.org/docs/rate-limits for details about rate limits for production enrvironment.
+Staging Environment (see
+https://letsencrypt.org/docs/staging-environment/) allows to debug
+various problems with certificate issuing and introduces much higher
+rate limits. Commands `certonly` and `run` used in the section below support `--test-cert` flag
+that switches `certbot` to the staging environment. It is recommended to
+test things with `--test-cert` flag first and only then issue the
+certificate in production mode by removing this flag.
+
 ### Issue certifiates via certbot with HTTP-01 challange
 
 Let us finally trigger an automatic issuing and installation of certificates: 
@@ -738,9 +749,6 @@ Finally, you can trigger simulate renewal (renewal) certificate(s) with just one
 ```
 sudo certbot renew --dry-run # remove '--dry-run' to perform actual renewal
 ```
-
-Please mind the LetsEncrypt rate limits (https://letsencrypt.org/docs/rate-limits/)!
-
 
 ### Check that all works as expected
 
