@@ -565,8 +565,8 @@ we see the static "nginx" webpage loaded
 while trying to run
 
 ```
-w3m http://nginx0-manjaro.devopshive.link:8080 -dump
-w3m http://nginx1-manjaro.devopshive.link:8080 -dump
+w3m http://nginx0-manjaro.devopshive.link -dump
+w3m http://nginx1-manjaro.devopshive.link -dump
 ```
 would result in error because the domain name is not registed yet.
 
@@ -668,6 +668,14 @@ https://letsencrypt.org/docs/faq/) which means we are forced to
 keep our web server's port 80 opened to the whole internet to allow
 HTTP-01 validation. If it is a problem you then you might be interested
 in DNS-01 validation (see section 8 below).
+
+At this stage commands 
+
+```
+w3m http://nginx0-manjaro.devopshive.link -dump
+w3m http://nginx1-manjaro.devopshive.link -dump
+```
+should open static pages served by NGINX.
 
 
 ### Install certbot along with certbot nginx plugin:
