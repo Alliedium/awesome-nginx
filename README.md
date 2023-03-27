@@ -227,7 +227,7 @@ w3m http://nginx1.devops-host.intranet:8080/static-legacy -dump
 w3m http://nginx2.devops-host.intranet:8080 -dump
 ```
 
-## 4. Nginx HTTPS Virtual Hosting with SNI without TLS termination
+## 4. Nginx HTTPS Virtual Hosting with SNI without TLS termination and with TCP forwarding
 
 ### Refer to 
 https://levelup.gitconnected.com/multiplex-tls-traffic-with-sni-routing-ece1e4e43e56
@@ -1010,3 +1010,4 @@ so that systemd picks up your changes.
 - https://scaron.info/blog/improve-your-nginx-ssl-configuration.html
 - https://serverfault.com/questions/997614/setting-ssl-prefer-server-ciphers-directive-in-nginx-config
 - https://wiki.archlinux.org/title/certbot#Automatic_renewal
+- https://gist.github.com/kekru/c09dbab5e78bf76402966b13fa72b9d2
